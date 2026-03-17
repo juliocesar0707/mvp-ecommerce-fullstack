@@ -1,4 +1,3 @@
-// src/pages/Cadastro.jsx
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../services/api';
@@ -14,10 +13,9 @@ export const Cadastro = () => {
   const navigate = useNavigate();
 
   const handleCadastro = async (e) => {
-    e.preventDefault(); // Evita que a página recarregue
+    e.preventDefault();
     setErro('');
 
-    // Validação simples
     if (senha !== confirmarSenha) {
       setErro('As senhas não coincidem!');
       return;
@@ -26,17 +24,9 @@ export const Cadastro = () => {
     setLoading(true);
 
     try {
-      // Envia os dados para a rota de registro que criamos no Node.js
-      await api.post('/auth/registrar', { 
-        nome, 
-        email, 
-        senha, 
-        role: 'CLIENTE' // Forçamos para que quem se cadastre aqui seja sempre cliente
-      });
-
+      await api.post('/auth/registrar', { nome, email, senha, role: 'CLIENTE' });
       alert('Cadastro realizado com sucesso! Faça seu login.');
-      navigate('/login'); // Manda o usuário para a tela de login
-      
+      navigate('/login');
     } catch (error) {
       setErro(error.response?.data?.erro || 'Erro ao realizar cadastro. Tente novamente.');
     } finally {
@@ -45,47 +35,62 @@ export const Cadastro = () => {
   };
 
   return (
-    <div className="flex justify-center items-center mt-10 mb-10">
-      <form onSubmit={handleCadastro} className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Criar Conta</h2>
+    // O flex-grow aqui trabalha junto com o App.jsx para cravar no meio da tela
+    <div className="flex-grow flex justify-center items-center px-4 py-12 w-full">
+      <form onSubmit={handleCadastro} className="bg-white p-10 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">
+        <h2 className="text-3xl font-extrabold mb-8 text-center text-gray-800 tracking-tight">Criar Conta</h2>
         
-        {erro && <p className="text-red-500 mb-4 text-center text-sm font-medium">{erro}</p>}
+        {erro && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm font-semibold text-center border border-red-200">
+            {erro}
+          </div>
+        )}
 
-        <input 
-          type="text" placeholder="Seu Nome Completo" required
-          className="w-full mb-4 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onChange={(e) => setNome(e.target.value)} 
-        />
-        
-        <input 
-          type="email" placeholder="E-mail" required
-          className="w-full mb-4 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onChange={(e) => setEmail(e.target.value)} 
-        />
-        
-        <input 
-          type="password" placeholder="Senha" required
-          className="w-full mb-4 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onChange={(e) => setSenha(e.target.value)} 
-        />
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Nome Completo</label>
+            <input type="text" required
+              className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none"
+              onChange={(e) => setNome(e.target.value)} 
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">E-mail</label>
+            <input type="email" required
+              className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none"
+              onChange={(e) => setEmail(e.target.value)} 
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Senha</label>
+            <input type="password" required
+              className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none"
+              onChange={(e) => setSenha(e.target.value)} 
+            />
+          </div>
 
-        <input 
-          type="password" placeholder="Confirme sua Senha" required
-          className="w-full mb-6 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onChange={(e) => setConfirmarSenha(e.target.value)} 
-        />
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Confirme sua Senha</label>
+            <input type="password" required
+              className="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors outline-none"
+              onChange={(e) => setConfirmarSenha(e.target.value)} 
+            />
+          </div>
+        </div>
 
         <button 
           type="submit" 
           disabled={loading}
-          className={`w-full text-white p-2 rounded transition font-medium
-            ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+          className={`w-full text-white p-3 rounded-lg font-bold text-lg mt-8 transition-all shadow-md hover:shadow-lg
+            ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 active:scale-[0.98]'}`}
         >
-          {loading ? 'Cadastrando...' : 'Finalizar Cadastro'}
+          {loading ? 'Processando...' : 'Finalizar Cadastro'}
         </button>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Já tem uma conta? <Link to="/login" className="text-blue-600 hover:underline">Faça login aqui</Link>
+        <p className="mt-8 text-center text-sm text-gray-600">
+          Já tem uma conta? <Link to="/login" className="text-blue-600 font-bold hover:underline">Faça login</Link>
         </p>
       </form>
     </div>
